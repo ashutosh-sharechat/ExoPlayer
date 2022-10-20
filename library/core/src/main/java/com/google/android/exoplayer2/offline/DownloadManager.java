@@ -801,7 +801,11 @@ public final class DownloadManager {
             downloadIndex.getDownloads(
                 STATE_QUEUED, STATE_STOPPED, STATE_DOWNLOADING, STATE_REMOVING, STATE_RESTARTING);
         while (cursor.moveToNext()) {
-          downloads.add(cursor.getDownload());
+          try {
+            downloads.add(cursor.getDownload());
+          } catch (Exception e) {
+            Log.e(TAG, "Init downloads exception");
+          }
         }
       } catch (IOException e) {
         Log.e(TAG, "Failed to load index.", e);

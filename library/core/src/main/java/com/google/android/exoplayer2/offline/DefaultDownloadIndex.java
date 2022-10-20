@@ -438,7 +438,13 @@ public final class DefaultDownloadIndex implements WritableDownloadIndex {
   }
 
   private static Download getDownloadForCurrentRow(Cursor cursor) {
-    byte[] keySetId = cursor.getBlob(COLUMN_INDEX_KEY_SET_ID);
+    byte[] keySetId;
+    try {
+      keySetId = cursor.getBlob(COLUMN_INDEX_KEY_SET_ID);
+    } catch (Exception e) {
+      throw e;
+    }
+
     DownloadRequest request =
         new DownloadRequest.Builder(
                 /* id= */ cursor.getString(COLUMN_INDEX_ID),
