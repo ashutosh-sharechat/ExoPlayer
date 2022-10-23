@@ -438,6 +438,13 @@ public final class DefaultDownloadIndex implements WritableDownloadIndex {
   }
 
   private static Download getDownloadForCurrentRow(Cursor cursor) {
+    return getDownloadForCurrentRow(cursor, false);
+  }
+
+  private static Download getDownloadForCurrentRow(Cursor cursor, boolean throwException) {
+    if (throwException)
+      throw new SQLException("Fake Exception");
+
     byte[] keySetId = cursor.getBlob(COLUMN_INDEX_KEY_SET_ID);
     DownloadRequest request =
         new DownloadRequest.Builder(
@@ -548,6 +555,11 @@ public final class DefaultDownloadIndex implements WritableDownloadIndex {
     @Override
     public Download getDownload() {
       return getDownloadForCurrentRow(cursor);
+    }
+
+    @Override
+    public Download getDebugDownload() {
+      return getDownloadForCurrentRow(cursor, true);
     }
 
     @Override

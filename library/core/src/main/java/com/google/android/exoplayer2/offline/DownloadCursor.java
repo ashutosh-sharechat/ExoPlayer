@@ -23,6 +23,9 @@ public interface DownloadCursor extends Closeable {
   /** Returns the download at the current position. */
   Download getDownload();
 
+  /** Returns the download at the current position. */
+  Download getDebugDownload();
+
   /** Returns the numbers of downloads in the cursor. */
   int getCount();
 

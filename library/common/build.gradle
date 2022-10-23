@@ -13,7 +13,7 @@
 // limitations under the License.
 apply from: "$gradle.ext.exoplayerSettingsDir/common_library_config.gradle"
 
-android.buildTypes.debug.testCoverageEnabled true
+android.buildTypes.debug.testCoverageEnabled false
 
 dependencies {
     api ('com.google.guava:guava:' + guavaVersion) {

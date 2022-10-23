@@ -17,14 +17,19 @@ afterEvaluate {
     publishing {
         repositories {
             maven {
-                url = findProperty('mavenRepo') ?: "${buildDir}/repo"
+                //url = "$rootDir/repo"
+                url = uri("https://maven.pkg.github.com/ashutosh-sharechat/exoplayer")
+                credentials {
+                    username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_USERNAME")
+                    password = project.findProperty("gpr.key") ?: System.getenv("GITHUB_TOKEN")
+                }
             }
         }
         publications {
             release(MavenPublication) {
                 from components.release
                 artifact androidSourcesJar
-                groupId = 'com.google.android.exoplayer'
+                groupId = 'in.mohalla.exoplayer'
                 artifactId = releaseArtifact
                 version releaseVersion
                 pom {
@@ -41,10 +46,6 @@ afterEvaluate {
                         developer {
                             name = 'The Android Open Source Project'
                         }
-                    }
-                    scm {
-                        connection = 'scm:git:https://github.com/google/ExoPlayer.git'
-                        url = 'https://github.com/google/ExoPlayer'
                     }
                 }
             }

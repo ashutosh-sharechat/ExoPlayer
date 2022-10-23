@@ -246,6 +246,12 @@ public final class DownloadManager {
    */
   public DownloadManager(
       Context context, WritableDownloadIndex downloadIndex, DownloaderFactory downloaderFactory) {
+    this(context, downloadIndex, downloaderFactory, false);
+  }
+
+  public DownloadManager(
+      Context context, WritableDownloadIndex downloadIndex, DownloaderFactory downloaderFactory,
+      boolean throwException) {
     this.context = context.getApplicationContext();
     this.downloadIndex = downloadIndex;
 
@@ -279,7 +285,7 @@ public final class DownloadManager {
 
     pendingMessages = 1;
     internalHandler
-        .obtainMessage(MSG_INITIALIZE, notMetRequirements, /* unused */ 0)
+        .obtainMessage(MSG_INITIALIZE, notMetRequirements, throwException ? 1 : 0)
         .sendToTarget();
   }
 
@@ -734,7 +740,8 @@ public final class DownloadManager {
       switch (message.what) {
         case MSG_INITIALIZE:
           int notMetRequirements = message.arg1;
-          initialize(notMetRequirements);
+          int throwException = message.arg2;
+          initialize(notMetRequirements, throwException);
           break;
         case MSG_SET_DOWNLOADS_PAUSED:
           boolean downloadsPaused = message.arg1 != 0;
@@ -792,7 +799,7 @@ public final class DownloadManager {
           .sendToTarget();
     }
 
-    private void initialize(int notMetRequirements) {
+    private void initialize(int notMetRequirements, int throwException) {
       this.notMetRequirements = notMetRequirements;
       DownloadCursor cursor = null;
       try {
@@ -801,7 +808,11 @@ public final class DownloadManager {
             downloadIndex.getDownloads(
                 STATE_QUEUED, STATE_STOPPED, STATE_DOWNLOADING, STATE_REMOVING, STATE_RESTARTING);
         while (cursor.moveToNext()) {
-          downloads.add(cursor.getDownload());
+          try {
+            downloads.add(throwException == 1 ? cursor.getDebugDownload() : cursor.getDownload());
+          } catch (Exception e) {
+            Log.e(TAG, "Downloads init failed", e);
+          }
         }
       } catch (IOException e) {
         Log.e(TAG, "Failed to load index.", e);
